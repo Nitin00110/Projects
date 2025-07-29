@@ -142,6 +142,36 @@ public:
 			}
 		} while (swapped);
 	}
+	void Edit(int n) {
+		To_Do_List* temp = head;
+		if (!temp || n < 1) {
+			cout << "Invalid position" << endl;
+			return;
+		}
+
+		for (int i = 1; i < n && temp; ++i) {
+			temp = temp->next;
+		}
+		if (!temp) {
+			cout << "Invalid position" << endl;
+			return;
+		}
+
+		cout << "Current Task: " << temp->Task << endl;
+		cout << "Enter new task name (or press Enter to cancel): ";
+		string newTask;
+		cin.ignore();
+		getline(cin, newTask);
+
+		if (newTask.empty()) {
+			cout << "Edit cancelled." << endl;
+			return;
+		}
+
+		temp->Task = newTask;
+		cout << "Task updated!" << endl;
+	}
+
 
 };
 
@@ -157,6 +187,7 @@ int main(){
 		cout << "Press 3 to Display all Tasks + Their Status" << endl;
 		cout << "Press 4 to Mark Done a Certain Task" << endl;
 		cout << "Press 5 to Close To-Do-List" << endl;
+		cout << "Press 6 to Edit a Task" << endl;
 		cout << "Enter your choice: ";
 		cin >> choice;
 		cin.ignore();
@@ -193,6 +224,12 @@ int main(){
 			todo.savelife();
 			cout << "Exited" << endl;
 			break;
+		}
+		else if (choice == 6) {
+			int id;
+			cout << "Which Task Number Do You Want to Edit?" << endl;
+			cin >> id;
+			todo.Edit(id);
 		}
 		else{
 			cout << "Invalid Input. Try Again" << endl;

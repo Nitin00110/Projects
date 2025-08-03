@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include<fstream>
+#include<unordered_map>
 using namespace std;
 
 class To_Do_List{
@@ -16,6 +17,15 @@ public:
 		next = nullptr;
 		prev = nullptr;
 		isDone = false;
+	}
+};
+class Trie{
+	public:
+	unordered_map<char,Trie*> children;
+	bool isEndofWord;
+
+	Trie(){
+		isEndofWord = false;
 	}
 };
 
@@ -85,6 +95,7 @@ public:
 		}
 
 	}
+
 	void markDone(int n){
 		To_Do_List* temp = head;
 		if(!temp) cout << "Add Task First to Mark Done" <<endl;
@@ -125,23 +136,17 @@ public:
 		file.close();
 	}
 	void sortByPriority() {
-		if (!head || !head->next) return;
+    if (!head || !head->next) return;
+    head = mergeSort(head);
 
-		bool swapped;
-		do {
-			swapped = false;
-			To_Do_List* curr = head;
-			while (curr && curr->next) {
-				if (curr->priority < curr->next->priority) {
-					swap(curr->Task, curr->next->Task);
-					swap(curr->priority, curr->next->priority);
-					swap(curr->isDone, curr->next->isDone);
-					swapped = true;
-				}
-				curr = curr->next;
-			}
-		} while (swapped);
+    To_Do_List* temp = head;
+    while (temp->next)
+        temp = temp->next;
+    tail = temp;
+
+    cout << "Tasks sorted by priority using Merge Sort (O(n log n))" << endl;
 	}
+
 	void Edit(int n) {
 		To_Do_List* temp = head;
 		if (!temp || n < 1) {
@@ -170,6 +175,47 @@ public:
 
 		temp->Task = newTask;
 		cout << "Task updated!" << endl;
+	}
+	To_Do_List* split(To_Do_List* head) {
+		To_Do_List* fast = head;
+		To_Do_List* slow = head;
+		while (fast->next && fast->next->next) {
+			fast = fast->next->next;
+			slow = slow->next;
+		}
+		To_Do_List* temp = slow->next;
+		slow->next = nullptr;
+		if(temp) temp->prev = nullptr;
+		return temp;
+	}
+
+	To_Do_List* mergeSorted(To_Do_List* first, To_Do_List* second) {
+		if (!first) return second;
+		if (!second) return first;
+
+		if (first->priority < second->priority) {
+			first->next = mergeSorted(first->next, second);
+			if(first->next) first->next->prev = first;
+			first->prev = nullptr;
+			return first;
+		} else {
+			second->next = mergeSorted(first, second->next);
+			if(second->next) second->next->prev = second;
+			second->prev = nullptr;
+			return second;
+		}
+	}
+
+	To_Do_List* mergeSort(To_Do_List* node) {
+		if (!node || !node->next)
+			return node;
+
+		To_Do_List* second = split(node);
+
+		node = mergeSort(node);
+		second = mergeSort(second);
+
+		return mergeSorted(node, second);
 	}
 
 
